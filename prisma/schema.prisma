@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model cargos {
+  car_id       Int            @id @default(autoincrement())
+  car_nome     String         @db.VarChar(255)
+  funcionarios funcionarios[]
+}
+
+model funcionarios {
+  fun_id               Int     @id @default(autoincrement())
+  fun_nome             String? @db.VarChar(255)
+  fun_cpf              String? @db.VarChar(255)
+  fun_data_contratacao String? @db.VarChar(255)
+  fun_matricula        String? @db.VarChar(255)
+  fun_email            String  @unique @db.VarChar(255)
+  fun_car_id           Int
+  cargos               cargos  @relation(fields: [fun_car_id], references: [car_id], map: "fk_fun_car")
+}
