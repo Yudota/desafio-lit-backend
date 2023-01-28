@@ -9,12 +9,14 @@ CREATE TABLE "cargos" (
 -- CreateTable
 CREATE TABLE "funcionarios" (
     "fun_id" SERIAL NOT NULL,
-    "fun_nome" VARCHAR(255),
-    "fun_cpf" VARCHAR(255),
-    "fun_data_contratacao" VARCHAR(255),
-    "fun_matricula" VARCHAR(255),
+    "fun_nome" VARCHAR(255) NOT NULL,
+    "fun_cpf" VARCHAR(255) NOT NULL,
+    "fun_data_contratacao" VARCHAR(255) NOT NULL,
+    "fun_matricula" VARCHAR(255) NOT NULL,
     "fun_email" VARCHAR(255) NOT NULL,
     "fun_car_id" INTEGER NOT NULL,
+    "fun_isActive" BOOLEAN NOT NULL,
+    "fun_senha" VARCHAR(255) NOT NULL,
 
     CONSTRAINT "funcionarios_pkey" PRIMARY KEY ("fun_id")
 );

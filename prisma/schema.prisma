@@ -15,11 +15,14 @@ model cargos {
 
 model funcionarios {
   fun_id               Int     @id @default(autoincrement())
-  fun_nome             String? @db.VarChar(255)
-  fun_cpf              String? @db.VarChar(255)
-  fun_data_contratacao String? @db.VarChar(255)
-  fun_matricula        String? @db.VarChar(255)
+  fun_nome             String  @db.VarChar(255)
+  fun_cpf              String  @db.VarChar(255)
+  fun_data_contratacao String  @db.VarChar(255)
+  fun_matricula        String  @db.VarChar(255)
   fun_email            String  @unique @db.VarChar(255)
   fun_car_id           Int
+  fun_isActive         Boolean
+  fun_senha            String  @db.VarChar(255)
+  fun_data_criacao     String  @db.VarChar(255)
   cargos               cargos  @relation(fields: [fun_car_id], references: [car_id], map: "fk_fun_car")
 }

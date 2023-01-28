@@ -1,9 +1,10 @@
 import AbsEntidadeDominio from "./AbsEntidadeDominio";
 import Cargo from "./Cargo";
-interface ICarteira {
+interface IFuncionario {
   id?: number
   nome: string
   cpf: string
+  senha: string
   data_contratacao: string
   matricula: string
   cargo: Cargo
@@ -16,8 +17,9 @@ export default class Funcionario extends AbsEntidadeDominio {
   private _matricula: string;
   private _cargo: Cargo;
   private _email: string;
+  private _senha: string;
 
-  constructor({ id, ...rest }: ICarteira) {
+  constructor({ id, ...rest }: IFuncionario) {
     super(id)
     for (const prop in rest) {
       this[prop.valueOf()] = rest[prop.valueOf()]
@@ -39,6 +41,13 @@ export default class Funcionario extends AbsEntidadeDominio {
   public get data_contratacao(): string {
     return this._data_contratacao;
   }
+  public get senha(): string {
+    return this._senha;
+  }
+  public set senha(senha: string) {
+    this._senha = senha;
+  }
+
   public set data_contratacao(data_contratacao: string) {
     this._data_contratacao = data_contratacao;
   }
