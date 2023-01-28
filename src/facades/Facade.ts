@@ -3,7 +3,8 @@ import AbstractDAO from "../DAO/AbstractDAO";
 import FuncionarioDAO from "../DAO/FuncionarioDAO";
 import AbsEntidadeDominio from "../models/AbsEntidadeDominio";
 import IStrategy from "../strategy/IStrategy";
-import ValidaExistencia from "../strategy/ValidaExistencias";
+import ValidaExistenciaCargo from "../strategy/ValidaExistenciaCargo";
+import ValidaExistenciaFuncionario from "../strategy/ValidaExistenciaFuncionario";
 import ValidarCpf from "../strategy/ValidarCpf";
 import Result from "../utils/Result";
 import IFacade from "./IFacade";
@@ -24,11 +25,11 @@ export default class Facade implements IFacade {
   constructor() {
     this.regras = {
       [TYPE_MODEL.FUNCIONARIO]: {
-        [TYPE_COMMAND.CREATE]: [new ValidarCpf()],
-        [TYPE_COMMAND.READ]: [new ValidaExistencia()],
-        [TYPE_COMMAND.UPDATE]: [new ValidarCpf()],
-        [TYPE_COMMAND.PATCH]: [new ValidarCpf()],
-        [TYPE_COMMAND.DELETE]: [new ValidarCpf()],
+        [TYPE_COMMAND.CREATE]: [new ValidaExistenciaCargo(), new ValidarCpf()],
+        [TYPE_COMMAND.READ]: [new ValidaExistenciaFuncionario()],
+        [TYPE_COMMAND.UPDATE]: [new ValidaExistenciaCargo(), new ValidaExistenciaFuncionario(), new ValidarCpf()],
+        [TYPE_COMMAND.PATCH]: [new ValidaExistenciaCargo(), new ValidaExistenciaFuncionario(), new ValidarCpf()],
+        [TYPE_COMMAND.DELETE]: [new ValidaExistenciaFuncionario()],
       },
 
     }
