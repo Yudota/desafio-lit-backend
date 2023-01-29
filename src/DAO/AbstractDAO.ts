@@ -19,7 +19,7 @@ export default abstract class AbstractDAO implements IDAO {
     return AbstractDAO.con
   }
   abstract criar(entidade: AbsEntidadeDominio): Promise<Result>
-  abstract alterar(entidade: AbsEntidadeDominio): Promise<Result>
+  abstract alterar(entidade: Partial<AbsEntidadeDominio>): Promise<Result>
   abstract excluir(id: number): Promise<Result>
   abstract consultar(entidade?: Partial<AbsEntidadeDominio>): Promise<Result>
 

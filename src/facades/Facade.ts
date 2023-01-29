@@ -1,14 +1,17 @@
 import { TYPE_COMMAND } from "../commands/types/typeCommand";
 import AbstractDAO from "../DAO/AbstractDAO";
+import CargoDAO from "../DAO/CargoDAO";
 import FuncionarioDAO from "../DAO/FuncionarioDAO";
 import AbsEntidadeDominio from "../models/AbsEntidadeDominio";
+import ValidaNomeCargo from "../strategy/cargo/ValidaNomeCargo";
 import IStrategy from "../strategy/IStrategy";
-import ValidaExistenciaCargo from "../strategy/ValidaExistenciaCargo";
-import ValidaExistenciaFuncionario from "../strategy/ValidaExistenciaFuncionario";
-import ValidarCpf from "../strategy/ValidarCpf";
+import ValidaExistenciaCargo from "../strategy/funcionario/ValidaExistenciaCargo";
+import ValidaExistenciaFuncionario from "../strategy/funcionario/ValidaExistenciaFuncionario";
+import ValidarCpf from "../strategy/funcionario/ValidarCpf";
 import Result from "../utils/Result";
 import IFacade from "./IFacade";
 import { TYPE_MODEL } from "./types/typeModel";
+import ValidaEmailFuncionario from "../strategy/funcionario/ValidaEmailFuncionario";
 
 type MapperStrategies = {
   [KEY in TYPE_COMMAND]: Array<IStrategy>
@@ -25,16 +28,24 @@ export default class Facade implements IFacade {
   constructor() {
     this.regras = {
       [TYPE_MODEL.FUNCIONARIO]: {
-        [TYPE_COMMAND.CREATE]: [new ValidaExistenciaCargo(), new ValidarCpf()],
-        [TYPE_COMMAND.READ]: [new ValidaExistenciaFuncionario()],
+        [TYPE_COMMAND.CREATE]: [new ValidaExistenciaCargo(), new ValidarCpf(), new ValidaEmailFuncionario()],
+        [TYPE_COMMAND.READ]: [],
         [TYPE_COMMAND.UPDATE]: [new ValidaExistenciaCargo(), new ValidaExistenciaFuncionario(), new ValidarCpf()],
         [TYPE_COMMAND.PATCH]: [new ValidaExistenciaCargo(), new ValidaExistenciaFuncionario(), new ValidarCpf()],
         [TYPE_COMMAND.DELETE]: [new ValidaExistenciaFuncionario()],
       },
+      [TYPE_MODEL.CARGO]: {
+        [TYPE_COMMAND.CREATE]: [new ValidaNomeCargo()],
+        [TYPE_COMMAND.READ]: [],
+        [TYPE_COMMAND.UPDATE]: [],
+        [TYPE_COMMAND.PATCH]: [],
+        [TYPE_COMMAND.DELETE]: [],
+      }
 
     }
     this.daos = {
-      [TYPE_MODEL.FUNCIONARIO]: new FuncionarioDAO()
+      [TYPE_MODEL.FUNCIONARIO]: new FuncionarioDAO(),
+      [TYPE_MODEL.CARGO]: new CargoDAO()
     }
   }
   async criar(entidade: AbsEntidadeDominio) {
@@ -45,18 +56,35 @@ export default class Facade implements IFacade {
 
     let result: Result = new Result('');
 
+    console.log('executando estrategias');
     for (const estrategia of regras) {
-      const { mensagem, erro, data } = await estrategia.processar(entidade);
-      result.mensagem += mensagem + '/n';
-      result.erro += erro;
-      result.data.push(...data);
-      if (result.erro) {
-        break;
+      try {
+
+        const { mensagem, erro, data } = await estrategia.processar(entidade)
+        result.mensagem += mensagem + '/n';
+        result.erro += erro;
+        result.data.push(...data);
+        if (result.erro) {
+          break;
+        }
+      } catch (error) {
+        return error
       }
     }
     if (!result.erro) {
-      result = await dao.criar(entidade)
+      try {
+        console.log('chamando a dao para criar');
+
+        result = await dao.criar(entidade)
+      } catch (error) {
+        console.log('chegou aq');
+
+        result = error.message
+        return result
+      }
     }
+    console.log('oq temos aq', result);
+
     return result
 
 
@@ -82,7 +110,11 @@ export default class Facade implements IFacade {
       }
     }
     if (!result.erro) {
-      result = await dao.consultar(entidade)
+      try {
+        result = await dao.consultar(entidade)
+      } catch (error) {
+        result = error.message
+      }
     }
     return result
 
@@ -106,7 +138,11 @@ export default class Facade implements IFacade {
       }
     }
     if (!result.erro) {
-      result = await dao.excluir(entidade.id)
+      try {
+        result = await dao.excluir(entidade.id)
+      } catch (error) {
+        result = error.message
+      }
     }
     return result
 
@@ -130,7 +166,11 @@ export default class Facade implements IFacade {
       }
     }
     if (!result.erro) {
-      result = await dao.excluir(entidade.id)
+      try {
+        result = await dao.alterar(entidade)
+      } catch (error) {
+        result = error.message
+      }
     }
     return result
 

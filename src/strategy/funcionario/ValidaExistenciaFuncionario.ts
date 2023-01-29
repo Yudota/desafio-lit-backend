@@ -1,11 +1,10 @@
-import Result from "../utils/Result";
-import IStrategy from "./IStrategy";
-import FuncionarioDAO from "../DAO/FuncionarioDAO";
-import Funcionario from "../models/Funcionario";
+import Result from "../../utils/Result";
+import IStrategy from "../IStrategy";
+import FuncionarioDAO from "../../DAO/FuncionarioDAO";
+import Funcionario from "../../models/Funcionario";
 
 export default class ValidaExistenciaFuncionario implements IStrategy {
   async processar(entidade: Funcionario): Promise<Result> {
-    console.log('validando existencia');
 
 
     const result = new Result('');

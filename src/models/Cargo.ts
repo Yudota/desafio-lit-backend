@@ -3,7 +3,7 @@ import AbsEntidadeDominio from "./AbsEntidadeDominio";
 export default class Cargo extends AbsEntidadeDominio {
   private _nome: string;
 
-  constructor(nome: string, id?: string) {
+  constructor(nome: string, id?: number) {
     super(id)
     this._nome = nome;
   }
