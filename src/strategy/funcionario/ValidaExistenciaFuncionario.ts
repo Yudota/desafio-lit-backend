@@ -12,12 +12,14 @@ export default class ValidaExistenciaFuncionario implements IStrategy {
 
     const funcionarioResult = (await daoFuncionario.consultar(entidade).then(result => result.data as unknown as Funcionario))
 
+    console.log('funcionarioResult', funcionarioResult);
+
     if (!funcionarioResult.id) {
       result.mensagem = "Funcionário não existe."
       result.erro = 1
       return result
     }
-    result.mensagem = "Funcionário e cargo encontrados"
+    result.mensagem = "Funcionário encontrado"
     return result
   }
 }

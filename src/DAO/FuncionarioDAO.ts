@@ -6,6 +6,18 @@ import AbstractDAO from "./AbstractDAO";
 
 
 export default class FuncionarioDAO extends AbstractDAO {
+  mapping = {
+    fun_id: "id",
+    fun_car_id: 'car_id',
+    fun_cpf: 'cpf',
+    fun_data_contratacao: 'data_contratacao',
+    fun_email: 'email',
+    fun_matricula: 'matricula',
+    fun_nome: 'nome',
+    fun_isActive: 'isActive',
+    fun_senha: 'senha',
+    fun_data_criacao: 'data_criacao',
+  };
   async criar(entidade: Funcionario): Promise<any> {
     const { cargo, cpf, data_contratacao, email, matricula, nome, senha } = entidade
 
@@ -38,10 +50,8 @@ export default class FuncionarioDAO extends AbstractDAO {
       if (!entidade.id) {
         return this.result = { mensagem: 'Identificação inválida', data: {} } as unknown as Result
       }
-
       // Cria um objeto vazio do tipo funcionarios
       const dadosAtualizar: any = {};
-
       // Itera sobre as chaves do objeto entidade
       for (const chave in entidade) {
         // Verifica se a chave é diferente de "cargo"
@@ -55,7 +65,6 @@ export default class FuncionarioDAO extends AbstractDAO {
       }
       const { fun_cargo, ...rest } = dadosAtualizar;
       const { _id: fun_car_id } = fun_cargo;
-
       const transformedEntry = {
         fun_car_id,
         ...rest
@@ -76,11 +85,10 @@ export default class FuncionarioDAO extends AbstractDAO {
       console.error('Deu problema', error)
       return this.result = { mensagem: 'erro', data: error } as unknown as Result
     }
-
   }
 
   async excluir(id: number): Promise<any> {
-    if (!Number.isInteger(id)) {
+    if (!Number.isNaN(id)) {
       try {
         const result = await AbstractDAO.getPrismaClient().funcionarios.update({
           where: { fun_id: id },
@@ -100,30 +108,41 @@ export default class FuncionarioDAO extends AbstractDAO {
   }
   async consultar(entidade?: Partial<Funcionario>): Promise<any> {
     console.log('consultando');
-
     if (!Number.isNaN(entidade.id)) {
+      console.log('ta aq');
       super.id = entidade.id
       try {
         const result = await AbstractDAO.getPrismaClient().funcionarios.findUnique({
           where: { fun_id: entidade.id },
         })
-        return this.result = { mensagem: 'Resultado encontrado', data: result } as unknown as Result
+        const data: Funcionario = {} as Funcionario
+        Object.keys(result).forEach(key => {
+          console.log('key: ' + result[key]);
+          if (this.mapping[key]) data[this.mapping[key]] = result[key];
+        });
+        console.log('resultado:', result)
+        return this.result = { mensagem: 'Resultado encontrado', data } as unknown as Result
       } catch (error) {
         console.log('ERRO::', error)
         return this.result
       }
     }
     else {
-
       try {
         const result = await AbstractDAO.getPrismaClient().funcionarios.findMany()
-        return this.result = { mensagem: 'Resultado encontrado', data: result } as unknown as Result
+        const data: Funcionario[] = [];
+        result.forEach(item => {
+          const cargo: Funcionario = {} as Funcionario;
+          Object.keys(item).forEach((key) => {
+            if (this.mapping[key]) cargo[this.mapping[key]] = item[key];
+          });
+          data.push(cargo);
+        });
+        return this.result = { mensagem: 'Resultado encontrado', data } as unknown as Result
       } catch (error) {
         console.log('ERRO::', error)
         return this.result
       }
     }
-
-
   }
 }
