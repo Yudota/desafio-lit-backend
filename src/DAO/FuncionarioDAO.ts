@@ -129,15 +129,29 @@ export default class FuncionarioDAO extends AbstractDAO {
     }
     else {
       try {
-        const result = await AbstractDAO.getPrismaClient().funcionarios.findMany()
-        const data: Funcionario[] = [];
-        result.forEach(item => {
-          const cargo: Funcionario = {} as Funcionario;
-          Object.keys(item).forEach((key) => {
-            if (this.mapping[key]) cargo[this.mapping[key]] = item[key];
+        const listFuncionarios = await AbstractDAO.getPrismaClient().funcionarios.findMany()
+        const listCargos = await AbstractDAO.getPrismaClient().cargos.findMany()
+        console.log('listCargos', listCargos)
+        const data: any[] = [];
+        console.log('antes do foreach do result');
+
+        listFuncionarios.forEach(funcionario => {
+          const formatedFuncionarios: any = {};
+          console.log('antes do foreach Object.keys');
+
+          Object.keys(funcionario).forEach(async (key) => {
+            console.log('dentro do forEach das keys', this.mapping[key]);
+
+            if (this.mapping[key]) formatedFuncionarios[this.mapping[key]] = funcionario[key];
+            if (this.mapping[key] === 'car_id') formatedFuncionarios['cargo'] = listCargos.filter(cargo => cargo.car_id === funcionario.fun_car_id)
           });
-          data.push(cargo);
+          console.log('dentro do forEach do result');
+          delete formatedFuncionarios.car_id
+          formatedFuncionarios.cargo = formatedFuncionarios.cargo[0]
+          data.push(formatedFuncionarios);
         });
+        console.log('retornando', data);
+
         return this.result = { mensagem: 'Resultado encontrado', data } as unknown as Result
       } catch (error) {
         console.log('ERRO::', error)
